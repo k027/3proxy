@@ -525,6 +525,7 @@ static void initbandlims (struct clientparam *param){
 		}
 	}
 	if(i<MAXBANDLIMS)param->bandlimsout[i] = NULL;
+	param->bandlimver = conf.bandlimver;
 }
 
 unsigned bandlimitfunc(struct clientparam *param, unsigned nbytesin, unsigned nbytesout){
@@ -671,7 +672,6 @@ int alwaysauth(struct clientparam * param){
 				param->maxtrafout64 = tc->traflim64 - tc->traf64; 
 			}
 		}
-
 	}
 	return res;
 }
