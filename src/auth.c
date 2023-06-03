@@ -505,6 +505,11 @@ void stopconnlims (struct clientparam *param){
 static void initbandlims (struct clientparam *param){
 	struct bandlim * be;
 	int i;
+
+	param->bandlimfunc = NULL;
+	param->bandlims[0] = NULL;
+	param->bandlimsout[0] = NULL;
+	if(!param->bandlimfunc || (!conf.bandlimiter && !conf.bandlimiterout)) return;
 	for(i=0, be = conf.bandlimiter; be && i<MAXBANDLIMS; be = be->next) {
 		if(ACLmatches(be->ace, param)){
 			if(be->ace->action == NOBANDLIM) {
