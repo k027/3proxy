@@ -556,12 +556,7 @@ unsigned bandlimitfunc(struct clientparam *param, unsigned nbytesin, unsigned nb
 	
 	if(!nbytesin && !nbytesout) return 0;
 	pthread_mutex_lock(&bandlim_mutex);
-	if(param->paused != conf.paused && param->bandlimver != conf.paused){
-		if(!conf.bandlimfunc){
-			param->bandlimfunc = NULL;
-			pthread_mutex_unlock(&bandlim_mutex);
-			return 0;
-		}
+	if(param->bandlimver != conf.bandlimver){
 		initbandlims(param);
 		param->bandlimver = conf.bandlimver;
 	}
