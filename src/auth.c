@@ -651,7 +651,7 @@ int alwaysauth(struct clientparam * param){
 		}
 
 		if(conf.trafcountfunc && conf.trafcounter) {
-
+			pthread_mutex_lock(&tc_mutex);
 			for(tc = conf.trafcounter; tc; tc = tc->next) {
 				if(tc->disabled) continue;
 				if(ACLmatches(tc->ace, param)){
@@ -677,7 +677,7 @@ int alwaysauth(struct clientparam * param){
 					param->maxtrafout64 = tc->traflim64 - tc->traf64; 
 				}
 			}
-
+			pthread_mutex_unlock(&tc_mutex);
 		}
 	}
 	return res;
