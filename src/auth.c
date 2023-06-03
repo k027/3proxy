@@ -644,7 +644,12 @@ int alwaysauth(struct clientparam * param){
 	if(conf.connlimiter && param->remsock == INVALID_SOCKET && startconnlims(param)) return 95;
 	res = doconnect(param);
 	if(!res){
-		initbandlims(param);
+		if(conf.bandlimfunc && (conf.bandlimiter||conf.bandlimiterout)){
+			pthread_mutex_lock(&bandlim_mutex);
+			initbandlims(param);
+			pthread_mutex_unlock(&bandlim_mutex);
+		}
+
 		for(tc = conf.trafcounter; tc; tc = tc->next) {
 			if(tc->disabled) continue;
 			if(ACLmatches(tc->ace, param)){
