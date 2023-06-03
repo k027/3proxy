@@ -650,32 +650,34 @@ int alwaysauth(struct clientparam * param){
 			pthread_mutex_unlock(&bandlim_mutex);
 		}
 
-		for(tc = conf.trafcounter; tc; tc = tc->next) {
-			if(tc->disabled) continue;
-			if(ACLmatches(tc->ace, param)){
-				if(tc->ace->action == NOCOUNTIN) break;
-				if(tc->ace->action != COUNTIN) {
-					countout = 1;
-					continue;
+		if(conf.trafcountfunc && conf.trafcounter) {
+
+			for(tc = conf.trafcounter; tc; tc = tc->next) {
+				if(tc->disabled) continue;
+				if(ACLmatches(tc->ace, param)){
+					if(tc->ace->action == NOCOUNTIN) break;
+					if(tc->ace->action != COUNTIN) {
+						countout = 1;
+						continue;
+					}
+					if(tc->traflim64 <= tc->traf64) return 10;
+					param->trafcountfunc = conf.trafcountfunc;
+					param->maxtrafin64 = tc->traflim64 - tc->traf64; 
 				}
-			
-				if(tc->traflim64 <= tc->traf64) return 10;
-				param->trafcountfunc = conf.trafcountfunc;
-				param->maxtrafin64 = tc->traflim64 - tc->traf64; 
 			}
-		}
-		if(countout)for(tc = conf.trafcounter; tc; tc = tc->next) {
-			if(tc->disabled) continue;
-			if(ACLmatches(tc->ace, param)){
-				if(tc->ace->action == NOCOUNTOUT) break;
-				if(tc->ace->action != COUNTOUT) {
-					continue;
+			if(countout)for(tc = conf.trafcounter; tc; tc = tc->next) {
+				if(tc->disabled) continue;
+				if(ACLmatches(tc->ace, param)){
+					if(tc->ace->action == NOCOUNTOUT) break;
+					if(tc->ace->action != COUNTOUT) {
+						continue;
+					}
+					if(tc->traflim64 <= tc->traf64) return 10;
+					param->trafcountfunc = conf.trafcountfunc;
+					param->maxtrafout64 = tc->traflim64 - tc->traf64; 
 				}
-			
-				if(tc->traflim64 <= tc->traf64) return 10;
-				param->trafcountfunc = conf.trafcountfunc;
-				param->maxtrafout64 = tc->traflim64 - tc->traf64; 
 			}
+
 		}
 	}
 	return res;
