@@ -372,6 +372,7 @@ static int h_daemon(int argc, unsigned char **argv){
 static int h_config(int argc, unsigned char **argv){
 	if(conf.conffile)myfree(conf.conffile);
 	conf.conffile = mystrdup((char *)argv[1]);
+	if(!conf.conffile) return 21;
 	return 0;
 }
 
@@ -525,7 +526,9 @@ static int h_users(int argc, unsigned char **argv){
 				pwl->password = (unsigned char *) mystrdup((char *)arg + 1);
 				pwl->pwtype = UN;
 			}
+			if(!pwl->password) return 3;
 		}
+		if(!pwl->user) return 21;
 		pthread_mutex_lock(&pwl_mutex);
 		pwl->next = conf.pwl;
 		conf.pwl = pwl;
@@ -689,6 +692,7 @@ static int h_monitor(int argc, unsigned char **argv){
 	}
 	else {
 		fm->path = mystrdup((char *)argv[1]);
+		if(!fm->path) return 21;
 		fm->next = conf.fmon;
 		conf.fmon = fm;
 	}
@@ -742,6 +746,7 @@ static int h_parent(int argc, unsigned char **argv){
 	getip46(46, argv[3], (struct sockaddr *)&chains->addr);
 #endif
 	chains->exthost = (unsigned char *)mystrdup((char *)argv[3]);
+	if(!chains->exthost) return 21;
 	*SAPORT(&chains->addr) = htons((unsigned short)atoi((char *)argv[4]));
 	if(argc > 5) chains->extuser = (unsigned char *)mystrdup((char *)argv[5]);
 	if(argc > 6) chains->extpass = (unsigned char *)mystrdup((char *)argv[6]);
@@ -846,6 +851,7 @@ struct ace * make_ace (int argc, unsigned char ** argv){
 				}
 				memset(userl, 0, sizeof(struct userlist));
 				userl->user=(unsigned char*)mystrdup((char *)arg);
+				if(!userl->user) return NULL;
 			} while((arg = (unsigned char *)strtok((char *)NULL, ",")));
 		}
 		if(argc > 1  && strcmp("*", (char *)argv[1])) {
